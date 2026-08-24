@@ -1,10 +1,10 @@
 {
   "domain": "itag_ble",
   "name": "iTag BLE Button",
-  "codeowners": ["@lovelyelfpop"],
+  "codeowners": ["@yourname"],
   "config_flow": true,
   "dependencies": ["bluetooth"],
-  "documentation": "https://github.com/lovelyelfpop/ha_itag_ble_button",
+  "documentation": "https://github.com/yourname/itag_ble",
   "iot_class": "local_push",
   "requirements": ["bleak-retry-connector>=3.3.0"],
   "version": "1.0.0"

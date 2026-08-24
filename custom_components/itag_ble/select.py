@@ -16,7 +16,6 @@ class ITagModeSelect(SelectEntity):
         self._attr_icon = "mdi:tune-vertical"
         self._attr_options = [MODE_SILENT, MODE_CLICK_BEEP, MODE_FIND]
         self._attr_current_option = MODE_CLICK_BEEP
-        # 绑定到同一个设备
         self._attr_device_info = handler.device_info
 
     async def async_select_option(self, option: str) -> None:

@@ -17,7 +17,6 @@ class ITagConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 data=user_input
             )
 
-        # 扫描附近搜索到的蓝牙设备供用户选择
         scanned_devices = bluetooth.async_discovered_service_info(self.hass)
         device_choices = {
             service_info.address: f"{service_info.name or '未知设备'} ({service_info.address})"
