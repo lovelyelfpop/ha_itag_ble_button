@@ -15,7 +15,8 @@ class ITagModeSelect(SelectEntity):
         self._attr_unique_id = f"{handler.mac}_work_mode"
         self._attr_icon = "mdi:tune-vertical"
         self._attr_options = [MODE_SILENT, MODE_CLICK_BEEP, MODE_FIND]
-        self._attr_current_option = MODE_CLICK_BEEP
+        # 默认静音：避免设备上电/重连时误响铃
+        self._attr_current_option = MODE_SILENT
         self._attr_device_info = handler.device_info
 
     async def async_select_option(self, option: str) -> None:

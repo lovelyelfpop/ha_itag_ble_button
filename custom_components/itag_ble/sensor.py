@@ -1,4 +1,5 @@
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
+from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.const import PERCENTAGE
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -6,7 +7,7 @@ from homeassistant.core import HomeAssistant
 from .const import DOMAIN
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities):
-    handler: "ITagDeviceHandler" = hass.data[DOMAIN][entry.entry_id]
+    handler = hass.data[DOMAIN][entry.entry_id]
     
     battery_sensor = ITagBatterySensor(handler)
     proxy_sensor = ITagProxySensor(handler)
@@ -19,8 +20,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     async_add_entities([battery_sensor, proxy_sensor, area_sensor])
 
 
-class ITagBatterySensor(SensorEntity):
-    """电量传感器"""
+class ITagBatterySensor(SensorEntity, RestoreEntity):
+    """电量传感器（断开不置0，支持重启记忆）"""
     def __init__(self, handler):
         self._handler = handler
         self._attr_name = "iTag Battery"
@@ -28,6 +29,18 @@ class ITagBatterySensor(SensorEntity):
         self._attr_native_unit_of_measurement = PERCENTAGE
         self._attr_device_class = SensorDeviceClass.BATTERY
         self._attr_device_info = handler.device_info
+
+    async def async_added_to_hass(self) -> None:
+        """重启后恢复上一次已知的电池百分比"""
+        await super().async_added_to_hass()
+        last_state = await self.async_get_last_state()
+        if last_state and last_state.state not in (None, "unknown", "unavailable"):
+            try:
+                # 仅当尚未从设备获取到最新电量时，还原上次记录
+                if self._handler.battery_level is None:
+                    self._handler.battery_level = int(last_state.state)
+            except ValueError:
+                pass
 
     @property
     def native_value(self):
